@@ -3,5 +3,4 @@ dependencies:
   - python=3.6
   - jupyter
   - numpy
-  - scipy
   - matplotlib
