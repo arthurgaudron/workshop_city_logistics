@@ -207,7 +207,7 @@ def f(clients, capacity, dropoff, dw, dw_start, dw_end, tw, tw_start, tw_end, fa
     
 
     #first_leg_time = math.ceil(b.avg_first_leg*60/50000)
-    first_leg_time = 7000*60/15000
+    first_leg_time = 700*60/20000
 
 
     #tour_time = math.ceil(b.avg_tour*60/20000)*6
@@ -216,9 +216,9 @@ def f(clients, capacity, dropoff, dw, dw_start, dw_end, tw, tw_start, tw_end, fa
     time_dropoff = dropoff*hot_fix_clients[clients]/vehicle_sim_results[clients][capacity]
 
     #return_leg_time = math.ceil(b.avg_return_leg*60/50000)
-    return_leg_time = 6000*60/15000
+    return_leg_time = 2500*60/20000
     
-    time_rungis = 10000*60/35000
+    time_rungis = 15000*60/35000
 
     print('The fleet is composed of ' + str(vehicle_sim_results[clients][capacity]) + " vehicles.")
     print('The average driving time between two deliveries is ' + str(time_sim_results[clients][capacity]) + " min.")
@@ -303,7 +303,7 @@ interactive_plot = interactive(f,
                                             disabled=False),
                                dw_start = widgets.Dropdown(
                                         options=time,
-                                        value=495,
+                                        value=510,
                                         description='starts at:'),
                                dw_end = widgets.Dropdown(
                                         options=time,
