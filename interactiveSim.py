@@ -1,9 +1,14 @@
 from ipywidgets import interactive
 import ipywidgets as widgets
 
+from ipywidgets import Layout
+
+
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+
+import matplotlib.ticker
 
 from matplotlib.ticker import FuncFormatter as ff
 
@@ -11,6 +16,9 @@ from matplotlib.ticker import FuncFormatter as ff
 driving_color = "#1f78b4"
 delivering_color = "#b2df8a"
 rungis_color = "#a6cee3"
+
+style = {'description_width': 'initial'}
+layout = Layout(width='60%')
 
 time = {'4:00': 240,
         '4:15': 255,
@@ -84,45 +92,16 @@ time = {'4:00': 240,
         '21:15': 1275,
         }
 
-orders = {
-          '5 orders': 0,
-          '10 orders': 1,
-          '15 orders': 2, 
-          '20 orders': 3,
-          '25 orders': 4,
-          '30 orders': 5,
-          '35 orders': 6,
-          '40 orders': 7,
-          '45 orders': 8,
-          '50 orders': 9,
+vehicle = {
+          'Cargo bike': 0,
+          'LCV': 1,
+          'Truck': 2, 
          }
 
-nb_clients = {'5 clients': 0,
-           '6 clients': 1,
-           '7 clients': 2,
-           '8 clients': 3,
-           '9 clients': 4,
-           '10 clients': 5,
-           '11 clients': 6,
-           '12 clients': 7,
-           '13 clients': 8,
-           '14 clients': 9,
-           '15 clients': 10,
-           '16 clients': 11,
-           '17 clients': 12,
-           '18 clients': 13,
-           '19 clients': 14,
-           '20 clients': 15,
-           '25 clients': 16,
-           '30 clients': 17,
-           '35 clients': 18,
-           '40 clients': 19,
-           '45 clients': 20,
-           '50 clients': 21}
+activity = {'Restaurant': 0,
+           'E-commerce': 1}
 
 
-hot_fix_clients = [5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-           16, 17, 18, 19, 20, 25, 30, 35, 40, 45, 50]
 
 dropoff_time = {'1 min': 1,
                 '2 min': 2, 
@@ -150,52 +129,33 @@ dropoff_time = {'1 min': 1,
 # 20, 25, 30, 35, 40, 45, 50
 
 time_sim_results = [
-[9.5, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5, 9.5],
-[2.3, 9.1, 9.1, 9.1, 9.1, 9.1, 9.1, 9.1, 9.1, 9.1],
-[2.6, 8.1, 8.1, 8.1, 8.1, 8.1, 8.1, 8.1, 8.1, 8.1],
-[3.3, 7.2, 7.2, 7.2, 7.2, 7.2, 7.2, 7.2, 7.2, 7.2],
-[3.2, 6.8, 6.8, 6.8, 6.8, 6.8, 6.8, 6.8, 6.8, 6.8],
-[3 ,  6.6, 6.6, 6.6, 6.6, 6.6, 6.6, 6.6, 6.6, 6.6],
-[1.8, 3,   6.4, 6.4, 6.4, 6.4, 6.4, 6.4, 6.4, 6.4],
-[1.8, 2.8, 6.2, 6.2, 6.2, 6.2, 6.2, 6.2, 6.2, 6.2],
-[1.7, 2.7, 6,   6,   6,   6,   6,   6,   6,   6],
-[1.7, 2.7, 5.9, 5.9, 5.9, 5.9, 5.9, 5.9, 5.9, 5.9],
-[1.7, 2.6, 5.7, 5.7, 5.7, 5.7, 5.7, 5.7, 5.7, 5.7],
-[1.1, 2.5, 2.5, 5.6, 5.6, 5.6, 5.6, 5.6, 5.6, 5.6],
-[1.1, 2.5, 2.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5, 5.5],
-[1.1, 2.5, 2.5, 5.3, 5.3, 5.3, 5.3, 5.3, 5.3, 5.3],
-[1,   2.5, 2.5, 5.3, 5.3, 5.3, 5.3, 5.3, 5.3, 5.3],
-[0.9, 2.4, 2.4, 5,   5,   5,   5,   5,   5, 5],
-[0.9, 1.4, 2.4, 2.4, 4.5, 4.6, 4.6, 4.6, 4.6, 4.6],
-[0.6, 1.3, 2.4, 2.5, 2.2, 4.4, 4.4, 4.4, 4.4, 4.4],
-[0.4, 1.3, 1.4, 2.5, 2.2, 2.3, 4.4, 4.4, 4.4, 4.4],
-[0.3, 1.1, 1.3, 2.5, 2.2, 2.2, 2.3, 4.3, 4.3, 4.4],
-[0.3, 1,   1.2, 1.3, 2.2, 2.3, 2.3, 2.3, 4.2, 4.4],
-[0.3, 0.6, 1,   1.3, 2.2, 2.4, 2.4, 2.2, 2.2, 4.4]]
+[38.38, 2.92],
+[2.67, 2.94],
+[2.69, 2.77]]
 
 vehicle_sim_results = [
-[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-[2, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-[2, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-[2, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-[2, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-[2, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-[3, 2, 1, 1, 1, 1, 1, 1, 1, 1],
-[3, 2, 1, 1, 1, 1, 1, 1, 1, 1],
-[3, 2, 1, 1, 1, 1, 1, 1, 1, 1],
-[3, 2, 1, 1, 1, 1, 1, 1, 1, 1],
-[3, 2, 1, 1, 1, 1, 1, 1, 1, 1],
-[4, 2, 2, 1, 1, 1, 1, 1, 1, 1],
-[4, 2, 2, 1, 1, 1, 1, 1, 1, 1],
-[4, 2, 2, 1, 1, 1, 1, 1, 1, 1],
-[4, 2, 2, 1, 1, 1, 1, 1, 1, 1],
-[4, 2, 2, 1, 1, 1, 1, 1, 1, 1],
-[5, 3, 2, 2, 1, 1, 1, 1, 1, 1],
-[6, 3, 2, 2, 2, 1, 1, 1, 1, 1],
-[8, 4, 3, 2, 2, 2, 1, 1, 1, 1],
-[8, 4, 3, 2, 2, 2, 2, 1, 1, 1],
-[10,5, 3, 3, 2, 2, 2, 2, 1, 1],
-[11,6, 4, 3, 2, 2, 2, 2, 2, 1]]
+[200, 8],
+[40, 4],
+[15, 2]]
+
+distance_sim_results = [
+[12.8, 42.6],
+[16.1, 48.8],
+[42.6, 92.4]]
+
+vehicle_capacity = [
+[1, 25],
+[5, 50],
+[15, 100]]
+
+list_vehicle = ["cargo bike(s)", "LCV(s)", "truck(s)" ]
+
+list_activity = ["restaurants", "e-commerce"]
+
+"""gap = [
+[, ],
+[, ],
+[68.7, ]]"""
 
 def m2hm(x, i):
     h = int(x/60)
@@ -203,28 +163,33 @@ def m2hm(x, i):
     return '%(h)02d:%(m)02d' % {'h':h,'m':m}
  
 
-def f(clients, capacity, dropoff, dw, dw_start, dw_end, tw, tw_start, tw_end, far_dc):
+def f(activity, vehicle, dropoff, dw, dw_start, dw_end, tw, tw_start, tw_end, far_dc, personel_daily_cost,
+       cargo_daily_cost, lcv_daily_cost, truck_daily_cost, cargo_emission, lcv_emission, truck_emission):
     
 
     #first_leg_time = math.ceil(b.avg_first_leg*60/50000)
-    first_leg_time = 700*60/20000
+    first_leg_time = 6000*60/20000
 
 
     #tour_time = math.ceil(b.avg_tour*60/20000)*6
-    tour_time = time_sim_results[clients][capacity]*(hot_fix_clients[clients]/vehicle_sim_results[clients][capacity])
+    tour_time = time_sim_results[vehicle][activity]*(200/vehicle_sim_results[vehicle][activity])
 
-    time_dropoff = dropoff*hot_fix_clients[clients]/vehicle_sim_results[clients][capacity]
+    time_dropoff = dropoff*(200/vehicle_sim_results[vehicle][activity])
 
     #return_leg_time = math.ceil(b.avg_return_leg*60/50000)
-    return_leg_time = 2500*60/20000
+    return_leg_time = 6000*60/20000
     
     time_rungis = 15000*60/35000
 
-    print('The fleet is composed of ' + str(vehicle_sim_results[clients][capacity]) + " vehicles.")
-    print('The average driving time between two deliveries is ' + str(time_sim_results[clients][capacity]) + " min.")
-    print('Each vehicle delivers in average ' + str(round(hot_fix_clients[clients]/vehicle_sim_results[clients][capacity])) + " clients.")
 
-    print("Therefore, average total driving time is " + str(tour_time) + " min." )
+    # Print the type of vehicle
+     
+    print('The fleet is composed of ' + str(vehicle_sim_results[vehicle][activity]) + ' '+ list_vehicle[vehicle] + ".")
+    print('The vehicles have a capacity of ' + str(vehicle_capacity[vehicle][activity]) + ' client(s), each vehicle delivers in average ' + str(round(200/vehicle_sim_results[vehicle][activity], 1)) + " client(s), each tour has an average length of " + str(distance_sim_results[vehicle][activity])+ " km.")
+    print('The average driving time between two deliveries is ' + str(time_sim_results[vehicle][activity]) + " min.")
+    #print('Each vehicle delivers in average ' + str(round(hot_fix_clients[clients]/vehicle_sim_results[clients][capacity])) + " clients.")
+
+    #print("Therefore, average total driving time is " + str(tour_time) + " min." )
 
 
     city_line_width = 3
@@ -252,7 +217,8 @@ def f(clients, capacity, dropoff, dw, dw_start, dw_end, tw, tw_start, tw_end, fa
         ax2.bar(2, return_leg_time, bottom=dw_start + first_leg_time + time_rungis + tour_time + time_dropoff, color = driving_color)
         ax2.bar(2, time_rungis, bottom= dw_start + first_leg_time + time_rungis + tour_time + time_dropoff + return_leg_time, color = rungis_color)
         
-        ax2.set_ylim(dw_start-100, dw_start + first_leg_time + time_rungis + tour_time + time_dropoff + return_leg_time + time_rungis + 100)
+        #ax2.set_ylim(dw_start-100, dw_start + first_leg_time + time_rungis + tour_time + time_dropoff + return_leg_time + time_rungis + 100)
+        ax2.set_ylim(dw_start-100, dw_end+100)
         
     else:
         fig2, ax2 = plt.subplots()
@@ -267,7 +233,13 @@ def f(clients, capacity, dropoff, dw, dw_start, dw_end, tw, tw_start, tw_end, fa
 
         ax2.bar(2, return_leg_time, bottom=first_leg_time + tour_time+dw_start+time_dropoff, color = driving_color)
         
-        ax2.set_ylim(dw_start-100, dw_start + first_leg_time + time_rungis + tour_time + time_dropoff + return_leg_time + time_rungis + 100)
+        #ax2.set_ylim(dw_start-100, dw_start + first_leg_time + time_rungis + tour_time + time_dropoff + return_leg_time + time_rungis + 100)
+        
+    if dw_start + first_leg_time + time_rungis + tour_time + time_dropoff + return_leg_time + time_rungis + 100 > dw_end+100:
+      ax2.set_ylim(dw_start-100, dw_start + first_leg_time + time_rungis + tour_time + time_dropoff + return_leg_time + time_rungis + 100)
+    
+    else:
+      ax2.set_ylim(dw_start-100, dw_end+100)
 
     ax2.yaxis.set_major_formatter(ff(m2hm))
 
@@ -285,12 +257,59 @@ def f(clients, capacity, dropoff, dw, dw_start, dw_end, tw, tw_start, tw_end, fa
         ax2.axhline(y=tw_end, color=tw_color, linestyle='--', linewidth=line_width, zorder=2)
     
     
-    ax2.set_title("Average working shift of the fleet – #" + str(vehicle_sim_results[clients][capacity]) + " vehicle(s)")
+    ax2.set_title("Average working shift of one " + list_vehicle[vehicle] + " delivering " + list_activity[activity])
     ax2.set_xticklabels(["", "", "First leg", "", "Tour", "", "Return leg"])
     ax2.tick_params(bottom=False)
     ax2.legend(bbox_to_anchor=(1.05, 1), loc=2)
     
     fig2.set_size_inches(15.5, 9.5)
+
+    # Plot cost per delivery
+
+    cargo_cost = vehicle_sim_results[0][activity]*(personel_daily_cost+cargo_daily_cost)
+    lcv_cost = vehicle_sim_results[1][activity]*(personel_daily_cost+lcv_daily_cost)
+    truck_cost = vehicle_sim_results[2][activity]*(personel_daily_cost+truck_daily_cost)
+
+    fig3, ax3 = plt.subplots()
+
+    ax3.bar(0, cargo_cost, color = driving_color)
+    ax3.bar(1, lcv_cost, color = driving_color)
+    ax3.bar(2, truck_cost, color = driving_color)
+
+    ax3.set_title("Total cost of delivery for " + list_activity[activity] + " (in €)")
+    ax3.set_xticklabels(["", "", str(vehicle_sim_results[0][activity]) + " cargo bikes", "", str(vehicle_sim_results[1][activity]) + " LCVs", "", str(vehicle_sim_results[2][activity]) + " trucks"])
+    ax3.yaxis.set_major_formatter(matplotlib.ticker.FormatStrFormatter('€%1.2f'))
+    fig3.set_size_inches(13.55, 8)
+
+    # Plot C02 emissions
+    if far_dc:
+      fig4, ax4 = plt.subplots()
+      ax4.bar(0, cargo_emission*(distance_sim_results[0][activity]*vehicle_sim_results[0][activity]), color = driving_color, label="Tour")
+      ax4.bar(0, cargo_emission*15*vehicle_sim_results[0][activity], bottom= cargo_emission*(distance_sim_results[0][activity]*vehicle_sim_results[0][activity]), color = rungis_color, label="Rungis")
+
+      ax4.bar(1, lcv_emission*(distance_sim_results[1][activity]*vehicle_sim_results[1][activity]), color = driving_color)
+      ax4.bar(1, lcv_emission*15*vehicle_sim_results[1][activity], bottom= lcv_emission*(distance_sim_results[1][activity]*vehicle_sim_results[1][activity]), color = rungis_color)
+
+      ax4.bar(2, truck_emission*(distance_sim_results[2][activity]*vehicle_sim_results[2][activity]), color = driving_color)
+      ax4.bar(2, truck_emission*15*vehicle_sim_results[2][activity], bottom= truck_emission*(distance_sim_results[2][activity]*vehicle_sim_results[2][activity]), color = rungis_color)
+
+
+    
+
+    else:
+      fig4, ax4 = plt.subplots()
+    
+      ax4.bar(0, cargo_emission*(distance_sim_results[0][activity]*vehicle_sim_results[0][activity]), color = driving_color, label="Tour")
+      ax4.bar(1, lcv_emission*(distance_sim_results[1][activity]*vehicle_sim_results[1][activity]), color = driving_color)
+      ax4.bar(2, truck_emission*(distance_sim_results[2][activity]*vehicle_sim_results[2][activity]), color = driving_color)
+
+    ax4.set_title("Total amount of C02 emissions to deliver " + list_activity[activity] + " (in g of CO2)")
+    ax4.set_xticklabels(["", "", str(vehicle_sim_results[0][activity]) + " cargo bikes", "", str(vehicle_sim_results[1][activity]) + " LCVs", "", str(vehicle_sim_results[2][activity]) + " trucks"])
+    ax4.legend(bbox_to_anchor=(1.05, 1), loc=2)
+
+    fig4.set_size_inches(13.95, 8)
+
+
 
 
 
@@ -303,7 +322,7 @@ interactive_plot = interactive(f,
                                             disabled=False),
                                dw_start = widgets.Dropdown(
                                         options=time,
-                                        value=510,
+                                        value=495,
                                         description='starts at:'),
                                dw_end = widgets.Dropdown(
                                         options=time,
@@ -321,14 +340,14 @@ interactive_plot = interactive(f,
                                         options=time,
                                         value=690,
                                         description='ends at:'),
-                               clients= widgets.Dropdown(
-                                        options=nb_clients,
-                                        value=21,
-                                        description='Nb clients:'),                             
-                               capacity = widgets.Dropdown(
-                                        options=orders,
+                               activity= widgets.Dropdown(
+                                        options=activity,
+                                        value=0,
+                                        description='Activity:'),                             
+                               vehicle = widgets.Dropdown(
+                                        options=vehicle,
                                         value=2,
-                                        description='Vehicle capacity:'),
+                                        description='Vehicle:'),
                                dropoff = widgets.Dropdown(
                                         options=dropoff_time,
                                         value=11,
@@ -336,8 +355,14 @@ interactive_plot = interactive(f,
                                far_dc=widgets.Checkbox(
                                             value=True,
                                             description='Distribution Center in Rungis',
-                                            disabled=False)
-
+                                            disabled=False),
+                               personel_daily_cost = widgets.IntSlider(min=0,max=500,step=1,value=120, description='Delivery personel daily cost (€):', style=style, layout=layout),
+                               cargo_daily_cost = widgets.IntSlider(min=0,max=500,step=1,value=1,description='Cargo bikes daily cost (€):', style=style, layout=layout),
+                               lcv_daily_cost = widgets.IntSlider(min=0,max=500,step=1,value=100,description='LCV daily cost (€):', style=style, layout=layout),
+                               truck_daily_cost = widgets.IntSlider(min=0,max=500,step=1,value=100,description='Truck daily cost (€):', style=style, layout=layout),
+                               cargo_emission = widgets.IntSlider(min=0,max=500,step=1,value=0,description='Cargo bikes CO2 emissions per km (g/km):', style=style, layout=layout),
+                               lcv_emission = widgets.IntSlider(min=0,max=500,step=1,value=100,description='LCV CO2 emissions per km (g/km):', style=style, layout=layout),
+                               truck_emission = widgets.IntSlider(min=0,max=500,step=1,value=100,description='Truck CO2 emissions per km (g/km):', style=style, layout=layout),
 
                                )
 
