@@ -179,7 +179,7 @@ def f(activity, vehicle, dropoff, dw, dw_start, dw_end, tw, tw_start, tw_end, fa
     #return_leg_time = math.ceil(b.avg_return_leg*60/50000)
     return_leg_time = 6000*60/20000
     
-    time_rungis = 15000*60/35000
+    time_rungis = 30000*60/70000
 
 
     # Print the type of vehicle
